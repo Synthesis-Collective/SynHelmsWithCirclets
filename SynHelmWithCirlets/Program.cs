@@ -24,14 +24,19 @@ namespace SynHelmsWithCirlcets
         {
             state.LoadOrder.PriorityOrder.Armor().WinningOverrides().ForEach(armor =>
             {
-                if (!string.IsNullOrEmpty(armor.Name?.String ?? "") && armor.BodyTemplate != null && armor.BodyTemplate.FirstPersonFlags.HasFlag(BipedObjectFlag.Circlet) && !armor.HasKeyword(Skyrim.Keyword.ArmorJewelry))
+                if (string.IsNullOrEmpty(armor.Name?.String ?? "") ||
+                    armor.BodyTemplate == null ||
+                    !armor.BodyTemplate.FirstPersonFlags.HasFlag(BipedObjectFlag.Circlet) ||
+                    armor.HasKeyword(Skyrim.Keyword.ArmorJewelry) ||
+                    armor.BodyTemplate.FirstPersonFlags.ToString().Equals("Circlet")
+                ) return;
+
+                var na = state.PatchMod.Armors.GetOrAddAsOverride(armor);
+                Console.WriteLine($"Patching {na.Name?.String} --- {na.BodyTemplate?.FirstPersonFlags.ToString()}");
+
+                if (na.BodyTemplate != null)
                 {
-                    var na = state.PatchMod.Armors.GetOrAddAsOverride(armor);
-                    Console.WriteLine($"Patching {na.Name?.String}");
-                    if (na.BodyTemplate != null)
-                    {
-                        na.BodyTemplate.FirstPersonFlags &= ~BipedObjectFlag.Circlet;
-                    }
+                    na.BodyTemplate.FirstPersonFlags &= ~BipedObjectFlag.Circlet;
                 }
             });
         }
