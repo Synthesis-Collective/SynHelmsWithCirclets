@@ -26,11 +26,23 @@ namespace SynHelmsWithCirlcets
             {
                 if (!string.IsNullOrEmpty(armor.Name?.String ?? "") && armor.BodyTemplate != null && armor.BodyTemplate.FirstPersonFlags.HasFlag(BipedObjectFlag.Circlet) && !armor.HasKeyword(Skyrim.Keyword.ArmorJewelry))
                 {
-                    var na = state.PatchMod.Armors.GetOrAddAsOverride(armor);
-                    Console.WriteLine($"Patching {na.Name?.String}");
-                    if (na.BodyTemplate != null)
+                    int bipedCount = 0;
+                    foreach (uint bipedFlagenum in Enum.GetValues(typeof(BipedObjectFlag)))
                     {
-                        na.BodyTemplate.FirstPersonFlags &= ~BipedObjectFlag.Circlet;
+                        if (armor.BodyTemplate.FirstPersonFlags.HasFlag((BipedObjectFlag)bipedFlagenum))
+                        {
+                            bipedCount++;
+                        }
+                    }
+                    if (bipedCount > 1)
+                    {
+                        var na = state.PatchMod.Armors.GetOrAddAsOverride(armor);
+                        Console.WriteLine($"Patching {na.Name?.String}");
+                        if (na.BodyTemplate != null)
+                        {
+
+                            na.BodyTemplate.FirstPersonFlags &= ~BipedObjectFlag.Circlet;
+                        }
                     }
                 }
             });
